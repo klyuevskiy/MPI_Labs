@@ -47,7 +47,7 @@ std::vector<std::uint32_t> generate_set(int rank, int set_size, std::uint32_t mi
 void print_set(std::vector<uint32_t> const& set, int rank)
 {
 	std::cout << std::format("Process {} set: ", rank);
-	std::ranges::copy(set, std::ostream_iterator<std::uint32_t>(std::cout, ", "));
+	std::ranges::copy(set, std::ostream_iterator<std::uint32_t>(std::cout, " "));
 	std::cout << std::endl;
 }
 
@@ -62,12 +62,12 @@ void master(int rank, int process_number)
 {
 	/* get m, min number, max number from user input */
 	std::cout << "input set size (m)" << std::endl;
-	auto set_size = input_in_range<std::uint32_t>(1, MAX_SET_SIZE);
+	auto set_size = input_in_segment<std::uint32_t>(1, MAX_SET_SIZE);
 	std::cout << "input min number" << std::endl;
-	auto min_number = input_in_range<std::uint32_t>(0, MAX_NUMBER);
+	auto min_number = input_in_segment<std::uint32_t>(0, MAX_NUMBER);
 	std::cout << "input max number" << std::endl;
 	/* add set size for non-empty set */
-	auto max_number = input_in_range<std::uint32_t>(min_number + set_size, MAX_NUMBER + set_size);
+	auto max_number = input_in_segment<std::uint32_t>(min_number + set_size, MAX_NUMBER + set_size);
 	
 	/* send information to all slaves */
 	for (int i = 1; i < process_number; i++)
