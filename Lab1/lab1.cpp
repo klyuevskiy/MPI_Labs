@@ -100,7 +100,7 @@ void master(int rank, int process_number)
 	print_set(set, rank);
 }
 
-void slave(int rank, int process_number)
+void slave(int rank)
 {
 	std::uint32_t set_size, min_number, max_number;
 	MPI_Status recv_status;
@@ -119,16 +119,12 @@ void slave(int rank, int process_number)
 
 int main(int argc, char **argv)
 {
-	MPI_Init(&argc, &argv);
+	MPI_env env(&argc, &argv);
 
-	int rank, process_number;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &process_number);
+	int rank = env.get_rank(), process_number = env.get_process_number();
 
 	if (rank == 0)
 		master(rank, process_number);
 	else
-		slave(rank, process_number);
-	
-	MPI_Finalize();
+		slave(rank);
 }

@@ -82,18 +82,21 @@ void master(int process_number)
 		function_values.data(), points_per_process, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
 	/* print table */
-	std::cout << "point | calculated value | real value" << std::endl;
+	std::cout << "point | calculated value | real value | error" << std::endl;
 	for (std::uint32_t i = 0; i < points_number; i++)
 	{
-		std::cout << std::format("{} | {} | {}",
+		double calculated = function_values[i];
+		double real_value = log(1 + points[i]);
+		std::cout << std::format("{} | {} | {} | {}",
 			points[i],
-			function_values[i],
-			log(1 + points[i]))
+			calculated,
+			real_value,
+			abs(calculated - real_value))
 			<< std::endl;
 	}
 }
 
-void slave(int rank, int process_number)
+void slave()
 {
 	double eps = 0;
 	std::uint32_t points_per_process = 0;
@@ -117,16 +120,10 @@ void slave(int rank, int process_number)
 
 int main(int argc, char** argv)
 {
-	MPI_Init(&argc, &argv);
+	MPI_env env(&argc, &argv);
 
-	int rank, process_number;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &process_number);
-
-	if (rank == 0)
-		master(process_number);
+	if (env.get_rank() == 0)
+		master(env.get_process_number());
 	else
-		slave(rank, process_number);
-
-	MPI_Finalize();
+		slave();
 }

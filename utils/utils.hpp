@@ -5,6 +5,36 @@
 #include <concepts>
 #include <format>
 
+/* use RAII for MPI environment */
+class MPI_env
+{
+	int rank, process_number;
+
+public:
+	MPI_env(int* argc, char*** argv)
+	{
+		MPI_Init(argc, argv);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Comm_size(MPI_COMM_WORLD, &process_number);
+	}
+
+	~MPI_env()
+	{
+		MPI_Finalize();
+	}
+
+	int get_rank() const
+	{
+		return rank;
+	}
+
+	int get_process_number()
+	{
+		return process_number;
+	}
+};
+
+/* input value */
 template <typename T>
 T input()
 	requires std::is_default_constructible_v<T>
